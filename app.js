@@ -876,13 +876,13 @@ async function saveFirebaseConfig(){
 // Auto-reconnect on page load if config saved — runs after DOM ready
 // ── Pre-baked Firebase config — works on any device automatically ──────────────
 const BAKED_FB_CONFIG = {
-  apiKey:            "AIzaSyBIa-nCeZURLmunpUdPwC4f-sOWrrDbbtk",
-  authDomain:        "mealtrackerwithseparateuser.firebaseapp.com",
-  projectId:         "mealtrackerwithseparateuser",
-  storageBucket:     "mealtrackerwithseparateuser.firebasestorage.app",
-  messagingSenderId: "434573777940",
-  appId:             "1:434573777940:web:9489fc70de7a0259c3db01",
-  measurementId:     "G-JP1QRL1J41"
+  apiKey:            "AIzaSyC6JwSVcCuS56Hiy65K4T7GFhD8ZfRvpZg",
+  authDomain:        "mealtrackerwithcustomdata.firebaseapp.com",
+  projectId:         "mealtrackerwithcustomdata",
+  storageBucket:     "mealtrackerwithcustomdata.firebasestorage.app",
+  messagingSenderId: "379393762983",
+  appId:             "1:379393762983:web:987977c1d1f39ff1241d82",
+  measurementId:     "G-HRCK8XLDWS"
 };
 
 function autoConnect(){
