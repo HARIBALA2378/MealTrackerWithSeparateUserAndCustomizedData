@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hybrid Athlete Tracker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     LOGIN PAGE
+═══════════════════════════════════════════════════ -->
+<div class="login-overlay hidden" id="login-overlay">
+  <div class="login-card">
+    <div class="login-logo">🏋️</div>
+    <div class="login-title">Hybrid Athlete</div>
+    <div class="login-sub">Personal Daily Tracker · Sign in to continue</div>
+
+    <div id="login-error" class="login-error"></div>
+
+    <div class="login-field">
+      <label for="login-email">Email</label>
+      <input class="login-input" type="email" id="login-email"
+        placeholder="you@example.com" autocomplete="email"/>
+    </div>
+
+    <div class="login-field">
+      <label for="login-password">Password</label>
+      <input class="login-input" type="password" id="login-password"
+        placeholder="Enter your password" autocomplete="current-password"/>
+      <button class="eye-btn" id="eye-login"
+        onclick="togglePassword('login-password','eye-login')" type="button">👁</button>
+    </div>
+
+    <button class="login-btn" id="login-submit" onclick="handleLogin()">Sign In</button>
+
+    <div class="divider">or</div>
+
+    <div class="auth-switch">
+      Don't have an account? <a onclick="showSignupPage()">Create one free</a>
+    </div>
+
+    <div class="login-note">
+      Your data is private — only you can see and edit your tracker.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     SIGNUP PAGE
+═══════════════════════════════════════════════════ -->
+<div class="signup-overlay hidden" id="signup-overlay">
+  <div class="login-card">
+    <div class="login-logo">🚀</div>
+    <div class="login-title">Create Account</div>
+    <div class="login-sub">Start your hybrid athlete journey</div>
+
+    <div id="signup-error" class="login-error"></div>
+
+    <div class="login-field">
+      <label for="signup-name">Your Name</label>
+      <input class="login-input" type="text" id="signup-name"
+        placeholder="e.g. Arjun" autocomplete="name"/>
+    </div>
+
+    <div class="login-field">
+      <label for="signup-email">Email</label>
+      <input class="login-input" type="email" id="signup-email"
+        placeholder="you@example.com" autocomplete="email"/>
+    </div>
+
+    <div class="login-field">
+      <label for="signup-password">Password</label>
+      <input class="login-input" type="password" id="signup-password"
+        placeholder="Minimum 6 characters" autocomplete="new-password"/>
+      <button class="eye-btn" id="eye-signup"
+        onclick="togglePassword('signup-password','eye-signup')" type="button">👁</button>
+    </div>
+
+    <div class="login-field">
+      <label for="signup-confirm">Confirm Password</label>
+      <input class="login-input" type="password" id="signup-confirm"
+        placeholder="Repeat your password" autocomplete="new-password"/>
+    </div>
+
+    <button class="login-btn" id="signup-submit" onclick="handleSignup()">Create Account</button>
+
+    <div class="divider">or</div>
+
+    <div class="auth-switch">
+      Already have an account? <a onclick="showLoginPage()">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     MAIN APP (shown only after login)
+═══════════════════════════════════════════════════ -->
+<div id="app-wrapper" style="display:none">
+
+  <div class="bg-orbs">
+    <div class="orb orb1"></div>
+    <div class="orb orb2"></div>
+    <div class="orb orb3"></div>
+  </div>
+
+  <div class="celebration" id="celebration">
+    <div class="cel-card">
+      <div class="cel-emoji" id="cel-emoji">🔥</div>
+      <div class="cel-title" id="cel-title">Done!</div>
+      <div class="cel-msg"   id="cel-msg">Keep going!</div>
+    </div>
+  </div>
+  <div class="save-notice" id="save-notice"></div>
+
+  <div class="wrap">
+
+    <div class="header">
+      <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:12px;flex-wrap:wrap;">
+        <div class="header-badge">Hybrid Athlete · Body Recomposition</div>
+        <span class="user-greeting" id="user-greeting"></span>
+        <button class="logout-btn" onclick="doLogout()">Sign out</button>
+      </div>
+      <h1>My Daily Tracker</h1>
+      <p>180cm · 84kg · Run faster · Lift heavier · Lose fat · Build muscle</p>
+    </div>
+
+    <div class="stats-top">
+      <div class="stat-card"><div class="stat-lbl">🔥 Current streak</div><div class="stat-val" id="s-streak" style="color:var(--amber)">0</div><div class="stat-sub">perfect days in a row</div></div>
+      <div class="stat-card"><div class="stat-lbl">🏆 Perfect days</div><div class="stat-val" id="s-perfect" style="color:var(--teal)">0</div><div class="stat-sub" id="s-perfect-sub">this month</div></div>
+      <div class="stat-card"><div class="stat-lbl">⚡ All-time tasks</div><div class="stat-val" id="s-alltime" style="color:var(--purple)">0</div><div class="stat-sub">tasks completed</div></div>
+    </div>
+
+    <!-- Storage & backup -->
+    <div class="storage-bar">
+      <div class="storage-top">
+        <span class="storage-title">💾 Data Storage</span>
+        <span class="storage-val" id="storage-val">calculating...</span>
+      </div>
+      <div class="storage-track"><div class="storage-fill" id="storage-fill" style="width:0%"></div></div>
+      <div class="fb-status-row">
+        <div class="fb-dot" id="fb-dot"></div>
+        <span id="fb-status-text" style="color:var(--muted)">Connecting...</span>
+      </div>
+      <div class="storage-actions">
+        <button class="action-btn btn-export" onclick="exportData()">⬇ Export backup</button>
+        <button class="action-btn btn-import" onclick="document.getElementById('imp-input').click()">⬆ Import backup</button>
+        <button class="action-btn btn-cleard" onclick="clearAllData()">🗑 Clear my data</button>
+      </div>
+      <input type="file" id="imp-input" accept=".json" style="display:none" onchange="importData(event)">
+    </div>
+
+    <!-- Date picker -->
+    <div class="date-picker-row">
+      <label>📅 Date:</label>
+      <select class="date-select" id="sel-day"   onchange="onDateChange()"></select>
+      <select class="date-select" id="sel-month" onchange="onDateChange()"></select>
+      <select class="date-select" id="sel-year"  onchange="onDateChange()"></select>
+      <button class="today-btn" onclick="goToday()">Today</button>
+    </div>
+
+    <div class="past-banner" id="past-banner">
+      <span>📅</span><span id="past-text">Viewing a past date</span>
+    </div>
+
+    <div class="day-tabs" id="day-tabs"></div>
+
+    <div class="progress-section">
+      <div class="ring-wrap">
+        <svg class="ring-svg" width="110" height="110" viewBox="0 0 110 110">
+          <circle class="ring-bg" cx="55" cy="55" r="46"/>
+          <circle class="ring-fill" id="ring-fill" cx="55" cy="55" r="46"
+            stroke-dasharray="289" stroke-dashoffset="289"/>
+        </svg>
+        <div class="ring-center">
+          <div class="ring-pct" id="ring-pct">0%</div>
+          <div class="ring-done" id="ring-done">0/0</div>
+        </div>
+      </div>
+      <div class="progress-info">
+        <h2 id="day-title">—</h2>
+        <div class="training-tag" id="day-training">—</div>
+        <div id="day-macros"></div>
+      </div>
+    </div>
+
+    <div class="motive-banner" id="motive-banner"
+      style="background:linear-gradient(135deg,rgba(0,212,160,.08),rgba(77,159,255,.08))">
+      <div class="motive-icon" id="motive-icon">💪</div>
+      <div>
+        <div class="motive-text" id="motive-text">Let's go!</div>
+        <div class="motive-sub"  id="motive-sub">Tick each task as you complete it</div>
+      </div>
+    </div>
+
+    <div id="tasks-container"></div>
+
+    <div class="week-section">
+      <div class="week-title">This week</div>
+      <div class="week-grid" id="week-grid"></div>
+    </div>
+
+    <div class="history-section">
+      <div class="history-title">Recent history</div>
+      <div id="history-list"></div>
+    </div>
+
+    <button class="reset-btn" onclick="resetDay()">↺ Reset selected day's progress</button>
+
+  </div><!-- end .wrap -->
+
+  <!-- ═══════════════════════════════════════════════
+       SETUP WIZARD (shown to new users)
+  ═══════════════════════════════════════════════ -->
+  <div class="setup-overlay hidden" id="setup-overlay">
+    <div class="setup-inner"><!-- rendered by meals.js renderSetupWizard() --></div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════
+       MEAL EDITOR (overlay, opened from FAB)
+  ═══════════════════════════════════════════════ -->
+  <div class="meal-editor-overlay hidden" id="meal-editor-overlay">
+    <div class="meal-editor-inner"><!-- rendered by meals.js renderMealEditor() --></div>
+  </div>
+
+  <!-- FAB button to open meal editor -->
+  <button class="edit-meals-fab" id="edit-meals-fab"
+    onclick="openMealEditor(keyToDayName(getSelKey()),'template')"
+    title="Edit your meal plan">✏️</button>
+
+</div><!-- end #app-wrapper -->
+
+<script src="app.js"></script>
+<script src="meals.js"></script>
+<script src="auth.js"></script>
+</body>
+</html>
