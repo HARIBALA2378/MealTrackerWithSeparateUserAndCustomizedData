@@ -179,7 +179,7 @@ function keyToDayName(k){
 function isFuture(k){ return k>todayKey(); }
 function isToday(k){ return k===todayKey(); }
 
-function getSelectedKey(){
+function getSelKey(){
   if(!state.selectedKey || isFuture(state.selectedKey)) return todayKey();
   return state.selectedKey;
 }
@@ -187,9 +187,10 @@ function getSelectedKey(){
 // ─── Progress ─────────────────────────────────────────────────────────────────
 function getProgress(dateKey){
   const dayName = keyToDayName(dateKey);
-  const comp = state.completions[dateKey]||{};
-  const tasks = MEALS[dayName].tasks;
-  const done  = tasks.filter(t=>comp[t.id]).length;
+  const comp    = state.completions[dateKey] || {};
+  const tasks   = getDynamicTasks(dateKey);
+  if(!tasks || tasks.length === 0) return {done:0, total:0, pct:0, dayName};
+  const done = tasks.filter(t => comp[t.id]).length;
   return {done, total:tasks.length, pct:Math.round(done/tasks.length*100), dayName};
 }
 // ─── Convert userMeals to task format ────────────────
@@ -221,10 +222,12 @@ function getCategoryIcon(badge){
 
 
 function getDoneMacros(dateKey){
-  const dayName = keyToDayName(dateKey);
-  const comp = state.completions[dateKey]||{};
+  const comp  = state.completions[dateKey] || {};
+  const tasks = getDynamicTasks(dateKey);
   let kcal=0,p=0,c=0,f=0;
-  MEALS[dayName].tasks.forEach(t=>{ if(comp[t.id]){kcal+=t.m.kcal;p+=t.m.p;c+=t.m.c;f+=t.m.f;} });
+  if(tasks) tasks.forEach(t => {
+    if(comp[t.id]){ kcal+=t.m.kcal; p+=t.m.p; c+=t.m.c; f+=t.m.f; }
+  });
   return {kcal,p,c,f};
 }
 
@@ -270,7 +273,7 @@ function computeAllTime(){
 
 // ─── Date Dropdown ────────────────────────────────────────────────────────────
 function buildDateDropdowns(){
-  const selKey = getSelectedKey();
+  const selKey = getSelKey();
   const selDate = keyToDate(selKey);
   const now = new Date();
 
@@ -367,7 +370,7 @@ function renderStats(){
 }
 
 function renderDayTabs(){
-  const selKey  = getSelectedKey();
+  const selKey  = getSelKey();
   const selDate = keyToDate(selKey);
   const selWD   = selDate.getDay()===0?6:selDate.getDay()-1; // 0=Mon
 
@@ -388,7 +391,7 @@ function renderDayTabs(){
 }
 
 function renderProgress(){
-  const dk = getSelectedKey();
+  const dk = getSelKey();
   const {done,total,pct,dayName} = getProgress(dk);
   const col = DAY_COLORS[dayName];
   const offset = 289-(pct/100)*289;
@@ -421,7 +424,7 @@ function renderProgress(){
 }
 
 function renderMotive(){
-  const dk  = getSelectedKey();
+  const dk  = getSelKey();
   const {pct} = getProgress(dk);
   const m = [...MOTIVES].reverse().find(x=>pct>=x.at)||MOTIVES[0];
   document.getElementById('motive-icon').textContent=m.icon;
@@ -430,7 +433,7 @@ function renderMotive(){
 }
 
 function renderPastBanner(){
-  const dk=getSelectedKey();
+  const dk=getSelKey();
   const banner=document.getElementById('past-banner');
   if(!isToday(dk)){
     const d=keyToDate(dk);
@@ -443,11 +446,33 @@ function renderPastBanner(){
 }
 
 function renderTasks(){
-  const dk      = getSelectedKey();
+  const dk      = getSelKey();
   const dayName = keyToDayName(dk);
   const comp    = state.completions[dk]||{};
-  const tgt = getDayTargets(dk);
-  const tasks   = MEALS[dayName].tasks;
+  const tgt     = getDayTargets(dk);
+  const tasks   = getDynamicTasks(dk);
+
+  // No meals set up — show empty state with button to open editor
+  if(!tasks || tasks.length === 0){
+    document.getElementById('tasks-container').innerHTML = `
+      <div style="text-align:center;padding:40px 20px;color:var(--muted)">
+        <div style="font-size:44px;margin-bottom:12px">🍽️</div>
+        <div style="font-size:16px;font-weight:700;margin-bottom:8px;color:var(--text)">
+          No meals set up for ${dayName}
+        </div>
+        <div style="font-size:13px;margin-bottom:20px;line-height:1.6">
+          Click the button below to add your meals for this day.
+        </div>
+        <button onclick="openMealEditor('${dayName}','template')"
+          style="background:var(--teal);color:#000;border:none;padding:12px 28px;
+                 border-radius:12px;font-weight:700;font-size:14px;cursor:pointer;
+                 font-family:'Inter',sans-serif;">
+          + Add meals for ${dayName}
+        </button>
+      </div>`;
+    return;
+  }
+
   const sections={};
   tasks.forEach(t=>{ if(!sections[t.s]) sections[t.s]=[]; sections[t.s].push(t); });
 
@@ -507,7 +532,7 @@ function renderTasks(){
 }
 
 function renderWeekBars(){
-  const selKey  = getSelectedKey();
+  const selKey  = getSelKey();
   const selDate = keyToDate(selKey);
   const selWD   = selDate.getDay()===0?6:selDate.getDay()-1;
 
@@ -564,7 +589,7 @@ function selectDate(k){
 }
 
 function selectByWeekday(idx){
-  const selKey  = getSelectedKey();
+  const selKey  = getSelKey();
   const selDate = keyToDate(selKey);
   const selWD   = selDate.getDay()===0?6:selDate.getDay()-1;
   const diff    = idx-selWD;
@@ -574,7 +599,7 @@ function selectByWeekday(idx){
 }
 
 function toggleTask(taskId){
-  const dk=getSelectedKey();
+  const dk=getSelKey();
   if(!state.completions[dk]) state.completions[dk]={};
   const wasAllDone=getProgress(dk).pct===100;
   state.completions[dk][taskId]=!state.completions[dk][taskId];
@@ -613,7 +638,7 @@ function toggleDrop(dropId,btnId){
 }
 
 function resetDay(){
-  const dk=getSelectedKey();
+  const dk=getSelKey();
   const dayName=keyToDayName(dk);
   if(!confirm(`Reset all tasks for ${dayName} (${dk})?`)) return;
   state.completions[dk]={};
