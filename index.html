@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hybrid Athlete Tracker</title>
 <link rel="stylesheet" href="style.css">
+  <script>
+    // Global error handler — shows error instead of blank screen
+    window.onerror = function(msg, src, line, col, err){
+      document.body.style.cssText = 'background:#0a0a0f;color:#f87171;font-family:monospace;padding:30px;';
+      document.body.innerHTML = '<h2>⚠️ JavaScript Error</h2><p style="color:#fbbf24">'+msg+'</p><p style="color:#7a7a9a;font-size:12px">'+src+' line '+line+'</p><p style="color:#7a7a9a;font-size:12px">Open F12 → Console for details</p>';
+    };
+  </script>
 </head>
 <body>
 

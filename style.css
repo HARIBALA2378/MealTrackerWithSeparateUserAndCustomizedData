@@ -18,7 +18,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 /* Header */
 .header{text-align:center;padding:28px 0 18px;}
 .header-badge{display:inline-block;background:linear-gradient(135deg,var(--teal),var(--blue));color:#000;font-size:11px;font-weight:700;padding:4px 14px;border-radius:20px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px;}
-.header h1{font-size:30px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#fff 30%,var(--teal));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:5px;}
+.header h1{font-size:30px;font-weight:900;letter-spacing:-1px;background:linear-gradient(135deg,#fff 30%,var(--teal));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;margin-bottom:5px;}
 .header p{font-size:13px;color:var(--muted);}
 
 /* Stats */
@@ -211,7 +211,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .login-title {
   font-size: 22px; font-weight: 900; letter-spacing: -0.5px;
   background: linear-gradient(135deg, #fff 30%, var(--teal));
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent;
   margin-bottom: 4px;
 }
 .login-sub {
@@ -440,7 +440,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-h
 .setup-logo   { font-size:40px; margin-bottom:8px; }
 .setup-title  { font-size:22px; font-weight:900; letter-spacing:-.5px;
                 background:linear-gradient(135deg,#fff 30%,var(--teal));
-                -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+                -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent; color:transparent; }
 .setup-sub    { font-size:13px; color:var(--muted); margin:6px 0 14px; }
 .setup-progress { height:4px; background:rgba(255,255,255,.06); border-radius:2px; overflow:hidden; }
 .setup-progress-bar { height:100%; background:var(--teal); border-radius:2px; transition:width .4s ease; }

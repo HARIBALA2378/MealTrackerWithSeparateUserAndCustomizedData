@@ -155,34 +155,44 @@ function togglePassword(inputId, btnId){
   btn.textContent = input.type==='password' ? '👁' : '🙈';
 }
 
-// ─── Enter key support ────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('login-email')
-    .addEventListener('keydown', e => { if(e.key==='Enter') document.getElementById('login-password').focus(); });
-  document.getElementById('login-password')
-    .addEventListener('keydown', e => { if(e.key==='Enter') handleLogin(); });
-  document.getElementById('signup-confirm')
-    .addEventListener('keydown', e => { if(e.key==='Enter') handleSignup(); });
-});
+// ─── Enter key support (handled inside DOMContentLoaded below) ────────────────
 
 // ─── ENTRY POINT ─────────────────────────────────────
-// Show login immediately, then load Firebase SDKs
-showLoginPage();  // Show login right away — no blank screen
+// Wait for DOM, then show login and load Firebase
+document.addEventListener('DOMContentLoaded', function(){
 
-(function loadSDKs(){
+  // Enter key support
+  document.getElementById('login-email')
+    .addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('login-password').focus(); });
+  document.getElementById('login-password')
+    .addEventListener('keydown', function(e){ if(e.key==='Enter') handleLogin(); });
+  document.getElementById('signup-confirm')
+    .addEventListener('keydown', function(e){ if(e.key==='Enter') handleSignup(); });
+
+  // Show login page immediately — no blank screen
+  showLoginPage();
+
+  // Load Firebase SDKs in sequence, then start auth
   function loadScript(src, cb){
     const s = document.createElement('script');
-    s.src = src; s.onload = cb;
-    s.onerror = () => { console.error('Failed:', src); };
+    s.src = src;
+    s.onload = cb;
+    s.onerror = function(){ console.error('Failed to load:', src); };
     document.head.appendChild(s);
   }
+
   const BASE = 'https://www.gstatic.com/firebasejs/10.7.1/';
-  loadScript(BASE+'firebase-app-compat.js', ()=>{
-    loadScript(BASE+'firebase-firestore-compat.js', ()=>{
-      loadScript(BASE+'firebase-auth-compat.js', ()=>{
-        if(!firebase.apps.length) firebase.initializeApp(BAKED_FB_CONFIG);
-        initAuthListener();
+  loadScript(BASE + 'firebase-app-compat.js', function(){
+    loadScript(BASE + 'firebase-firestore-compat.js', function(){
+      loadScript(BASE + 'firebase-auth-compat.js', function(){
+        try {
+          if(!firebase.apps.length) firebase.initializeApp(BAKED_FB_CONFIG);
+          initAuthListener();
+        } catch(e){
+          console.error('Firebase init error:', e);
+        }
       });
     });
   });
-})();
+
+});
